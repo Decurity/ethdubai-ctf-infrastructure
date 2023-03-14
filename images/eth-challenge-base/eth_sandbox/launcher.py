@@ -37,13 +37,17 @@ def check_ticket(ticket: str) -> Ticket:
         return Ticket(challenge_id=CHALLENGE_ID, team_id="team")
 
     ticket_info = requests.get(
-        f"https://us-central1-paradigm-ctf-2022.cloudfunctions.net/checkTicket?ticket={ticket}"
-    ).json()
-    if ticket_info["status"] != "VALID":
+        f"https://ethdubai-ctf.decurity.io/",
+        cookies={"session": ticket},
+    ).text
+
+    if "'userName': null" in ticket_info:
         return None
+    
+    team_id = ticket.split(".")[0]
 
     return Ticket(
-        challenge_id=ticket_info["challengeId"], team_id=ticket_info["teamId"]
+        challenge_id=CHALLENGE_ID, team_id=team_id
     )
 
 
@@ -81,7 +85,7 @@ def new_launch_instance_action(
     do_deploy: Callable[[Web3, str], str],
 ):
     def action() -> int:
-        ticket = check_ticket(input("ticket please: "))
+        ticket = check_ticket(input("Session cookie at ethdubai-ctf.decurity.io please: "))
         if not ticket:
             print("invalid ticket!")
             return 1

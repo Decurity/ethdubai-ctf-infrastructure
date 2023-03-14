@@ -255,7 +255,9 @@ def proxy(uuid):
         }
 
     resp = requests.post(f"http://127.0.0.1:{node_info['port']}", json=body)
-    response = Response(resp.content, resp.status_code, resp.raw.headers.items())
+    # copy every header from resp.raw.headers.items() except access-control-allow-origin
+    headers = {k: v for k, v in resp.raw.headers.items() if k.lower() != "access-control-allow-origin"}
+    response = Response(resp.content, resp.status_code, headers)
     return response
 
 
